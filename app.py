@@ -32,8 +32,8 @@ def generate_predictions(home_team, away_team):
     }
     
     return {
-        'score': f"{round(base_stats['avg_home_goals'] * (1 + home_factor - away_factor/2)}-{round(base_stats['avg_away_goals'] * (1 + away_factor - home_factor/2))}",
-        'corners': int(base_stats['avg_corners'] * (1 + (home_factor + away_factor)/3),
+        'score': f"{round(base_stats['avg_home_goals'] * (1 + home_factor - away_factor/2))}-{round(base_stats['avg_away_goals'] * (1 + away_factor - home_factor/2))}",
+        'corners': int(base_stats['avg_corners'] * (1 + (home_factor + away_factor)/3)),
         'cards': int(base_stats['avg_cards'] * (1 + (home_factor + away_factor)/4)),
         'possession': f"{int(50 + (home_factor - away_factor)*15)}%-{int(50 + (away_factor - home_factor)*15)}%",
         'shots_on_target': f"{int(5 + home_factor*4)}-{int(4 + away_factor*3)}",
@@ -77,7 +77,7 @@ def fetch_matches():
         
     except Exception as e:
         print(f"Erro na API: {str(e)}")
-        return []  # Retorna vazio se falhar
+        return []
 
 @app.route('/')
 def index():
@@ -95,5 +95,5 @@ scheduler.add_job(update_data, 'interval', hours=6)
 scheduler.start()
 
 if __name__ == '__main__':
-    update_data()  # Atualiza imediatamente ao iniciar
+    update_data()
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
