@@ -50,7 +50,7 @@ def generate_predictions(home_team, away_team):
     
     # Previsão de placar (com lógica para evitar valores absurdos)
     home_goals = min(5, max(0, round(base_stats['avg_home_goals'] + random.uniform(-0.5, 0.5)))
-    away_goals = min(4, max(0, round(base_stats['avg_away_goals'] + random.uniform(-0.5, 0.5))))
+    away_goals = min(4, max(0, round(base_stats['avg_away_goals'] + random.uniform(-0.5, 0.5)))
     
     return {
         'score': f"{home_goals}-{away_goals}",
