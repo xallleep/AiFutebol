@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Futebol - Palpites do Dia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .match-card {
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .match-header {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+        }
+        .team-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .vs {
+            font-size: 1.2rem;
+            margin: 0 1rem;
+        }
+        .prediction-card {
+            border-left: 4px solid #0d6efd;
+            margin-bottom: 1rem;
+        }
+        .stat-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .stat-value {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .player-list {
+            column-count: 2;
+        }
+        @media (max-width: 768px) {
+            .player-list {
+                column-count: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <h1 class="text-center mb-4">⚽ Análise de Futebol - Palpites do Dia</h1>
+        
+        {% if matches %}
+            {% for match in matches %}
+                <div class="card match-card">
+                    <div class="card-header match-header text-center">
+                        <h3>{{ match.competition }}</h3>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="team-name text-end">{{ match.home_team }}</div>
+                            <div class="vs">vs</div>
+                            <div class="team-name text-start">{{ match.away_team }}</div>
+                        </div>
+                        <div class="text-muted">{{ match.date }} às {{ match.time }}</div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card prediction-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Palpite de Placar</h5>
+                                        <h2 class="text-primary">{{ match.predicted_score }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card prediction-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Escanteios</h5>
+                                        <h2 class="text-primary">{{ match.predicted_corners }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card prediction-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Cartões Amarelos</h5>
+                                        <h2 class="text-primary">{{ match.predicted_cards }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mt-4">📊 Estatísticas Previstas</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Posse de Bola:</span>
+                                        <span class="stat-value">{{ match.stats.posse_bola }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Chutes no Gol:</span>
+                                        <span class="stat-value">{{ match.stats.chutes_gol }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Total de Chutes:</span>
+                                        <span class="stat-value">{{ match.stats.chutes }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Faltas Cometidas:</span>
+                                        <span class="stat-value">{{ match.stats.faltas }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <h4>🔴 {{ match.home_team }} - Escalação</h4>
+                                <ul class="player-list">
+                                    {% for player in match.lineup_home %}
+                                        <li>{{ player }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>🔵 {{ match.away_team }} - Escalação</h4>
+                                <ul class="player-list">
+                                    {% for player in match.lineup_away %}
+                                        <li>{{ player }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-warning text-center">
+                Nenhum jogo encontrado para hoje.
+            </div>
+        {% endif %}
+        
+        <div class="text-end text-muted mt-4">
+            Última atualização: {{ last_updated }}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

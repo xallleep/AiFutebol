@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: futebol-analise
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.16
+      - key: FOOTBALL_DATA_API_KEY
+        value: b02bfc4db4a34dca9e278b65b2244e6b
+    plan: free
