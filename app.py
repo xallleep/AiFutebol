@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from datetime import datetime
-import scraper
+from football_api import get_today_matches
 from football_api import get_today_matches  # Importe a função da API
 import os
 import threading
