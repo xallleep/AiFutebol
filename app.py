@@ -65,7 +65,7 @@ def generate_predictions(home_team, away_team):
 def fetch_matches():
     """Busca jogos com fallback inteligente"""
     try:
-        if not API_KEY or API_KEY == 'b02bfc4db4a34dca9e278b65b2244e6b':
+        if not API_KEY or API_KEY == '649cf8ffe83e4d43bf84371461b70a4e':
             logger.warning("Usando API KEY pública - Limitações podem aplicar")
         
         headers = {'X-Auth-Token': API_KEY}
