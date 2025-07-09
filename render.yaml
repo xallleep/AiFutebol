@@ -8,4 +8,4 @@ services:
       - key: PYTHON_VERSION
         value: 3.9.16
       - key: FOOTBALL_DATA_API_KEY
-        value: b02bfc4db4a34dca9e278b65b2244e6b
+        value: 649cf8ffe83e4d43bf84371461b70a4e

@@ -13,7 +13,7 @@ cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
 cache.init_app(app)
 
 # Configurações
-API_KEY = os.getenv('FOOTBALL_DATA_API_KEY', 'b02bfc4db4a34dca9e278b65b2244e6b')
+API_KEY = os.getenv('FOOTBALL_DATA_API_KEY', '649cf8ffe83e4d43bf84371461b70a4e')
 matches_data = []
 last_updated = None
 
