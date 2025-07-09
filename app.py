@@ -19,7 +19,7 @@ def get_team_lineup(team_name):
 
 def generate_predictions(home_team, away_team):
     """Gera previsões realistas baseadas em estatísticas"""
-    # Fatores baseados nos nomes dos times (para consistência)
+    # Fatores baseados nos nomes dos times
     home_factor = sum(ord(c) for c in home_team) % 100 / 100
     away_factor = sum(ord(c) for c in away_team) % 100 / 100
     
