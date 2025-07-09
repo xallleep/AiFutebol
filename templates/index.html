@@ -3,164 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análise de Futebol - Palpites do Dia</title>
+    <title>⚽ Análise de Futebol Automatizada</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .match-card {
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            overflow: hidden;
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
         }
-        .match-header {
-            background-color: #343a40;
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .header {
+            background: var(--primary);
             color: white;
-            padding: 1rem;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .team-name {
-            font-size: 1.5rem;
-            font-weight: bold;
+        
+        .match-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s;
         }
-        .vs {
-            font-size: 1.2rem;
-            margin: 0 1rem;
+        
+        .match-card:hover {
+            transform: translateY(-5px);
         }
-        .prediction-card {
-            border-left: 4px solid #0d6efd;
-            margin-bottom: 1rem;
+        
+        .match-header {
+            background: var(--primary);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
         }
+        
+        .prediction-badge {
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+        }
+        
         .stat-card {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            border-left: 4px solid var(--secondary);
         }
-        .stat-value {
-            font-weight: bold;
-            color: #0d6efd;
+        
+        .player-badge {
+            display: inline-block;
+            margin: 0.2rem;
+            padding: 0.3rem 0.6rem;
+            background: var(--light);
+            border-radius: 20px;
+            font-size: 0.85rem;
         }
-        .player-list {
-            column-count: 2;
-        }
+        
         @media (max-width: 768px) {
-            .player-list {
-                column-count: 1;
+            .player-column {
+                margin-bottom: 1.5rem;
             }
         }
     </style>
 </head>
-<body class="bg-light">
+<body>
+    <div class="header text-center">
+        <div class="container">
+            <h1 class="display-4">⚽ Análise de Futebol Inteligente</h1>
+            <p class="lead mb-0">Previsões automáticas atualizadas diariamente</p>
+            <small class="text-white-50">Última atualização: {{ last_updated or "N/A" }}</small>
+        </div>
+    </div>
+
     <div class="container py-4">
-        <h1 class="text-center mb-4">⚽ Análise de Futebol - Palpites do Dia</h1>
-        
         {% if matches %}
-            {% for match in matches %}
-                <div class="card match-card">
-                    <div class="card-header match-header text-center">
-                        <h3>{{ match.competition }}</h3>
-                        <div class="d-flex justify-content-center align-items-center">
-                            <div class="team-name text-end">{{ match.home_team }}</div>
-                            <div class="vs">vs</div>
-                            <div class="team-name text-start">{{ match.away_team }}</div>
-                        </div>
-                        <div class="text-muted">{{ match.date }} às {{ match.time }}</div>
-                    </div>
-                    
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card prediction-card">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title">Palpite de Placar</h5>
-                                        <h2 class="text-primary">{{ match.predicted_score }}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card prediction-card">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title">Escanteios</h5>
-                                        <h2 class="text-primary">{{ match.predicted_corners }}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card prediction-card">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title">Cartões Amarelos</h5>
-                                        <h2 class="text-primary">{{ match.predicted_cards }}</h2>
-                                    </div>
-                                </div>
-                            </div>
+            <div class="row">
+                {% for match in matches %}
+                <div class="col-lg-6">
+                    <div class="card match-card mb-4">
+                        <div class="card-header match-header text-white">
+                            <h4 class="mb-0">{{ match.competition }}</h4>
+                            <small>{{ match.date }} às {{ match.time }}</small>
                         </div>
                         
-                        <h4 class="mt-4">📊 Estatísticas Previstas</h4>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="stat-card">
-                                    <div class="d-flex justify-content-between">
-                                        <span>Posse de Bola:</span>
-                                        <span class="stat-value">{{ match.stats.posse_bola }}</span>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-center align-items-center mb-4">
+                                <h3 class="mb-0 text-center">
+                                    <span class="badge bg-primary">{{ match.home_team }}</span>
+                                    <span class="mx-3">vs</span>
+                                    <span class="badge bg-danger">{{ match.away_team }}</span>
+                                </h3>
+                            </div>
+                            
+                            <h5 class="text-center mb-3">🔮 Palpite do Sistema</h5>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <div class="p-3 text-center stat-card">
+                                        <h6>Placar</h6>
+                                        <span class="badge prediction-badge bg-success">{{ match.prediction.score }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 text-center stat-card">
+                                        <h6>Escanteios</h6>
+                                        <span class="badge prediction-badge bg-warning text-dark">{{ match.prediction.corners }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 text-center stat-card">
+                                        <h6>Cartões</h6>
+                                        <span class="badge prediction-badge bg-danger">{{ match.prediction.cards }}</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="stat-card">
-                                    <div class="d-flex justify-content-between">
-                                        <span>Chutes no Gol:</span>
-                                        <span class="stat-value">{{ match.stats.chutes_gol }}</span>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-6 player-column">
+                                    <h5 class="text-center mb-3">🔴 {{ match.home_team }}</h5>
+                                    <div class="text-center">
+                                        {% for player in match.lineup_home %}
+                                            <span class="player-badge">{{ player }}</span>
+                                        {% endfor %}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="stat-card">
-                                    <div class="d-flex justify-content-between">
-                                        <span>Total de Chutes:</span>
-                                        <span class="stat-value">{{ match.stats.chutes }}</span>
+                                <div class="col-md-6 player-column">
+                                    <h5 class="text-center mb-3">🔵 {{ match.away_team }}</h5>
+                                    <div class="text-center">
+                                        {% for player in match.lineup_away %}
+                                            <span class="player-badge">{{ player }}</span>
+                                        {% endfor %}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="stat-card">
-                                    <div class="d-flex justify-content-between">
-                                        <span>Faltas Cometidas:</span>
-                                        <span class="stat-value">{{ match.stats.faltas }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mt-4">
-                            <div class="col-md-6">
-                                <h4>🔴 {{ match.home_team }} - Escalação</h4>
-                                <ul class="player-list">
-                                    {% for player in match.lineup_home %}
-                                        <li>{{ player }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <h4>🔵 {{ match.away_team }} - Escalação</h4>
-                                <ul class="player-list">
-                                    {% for player in match.lineup_away %}
-                                        <li>{{ player }}</li>
-                                    {% endfor %}
-                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         {% else %}
             <div class="alert alert-warning text-center">
-                Nenhum jogo encontrado para hoje.
+                <h4 class="alert-heading">⏳ Nenhum jogo encontrado</h4>
+                <p>Atualizamos nossas análises automaticamente a cada 6 horas</p>
             </div>
         {% endif %}
-        
-        <div class="text-end text-muted mt-4">
-            Última atualização: {{ last_updated }}
-        </div>
     </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-4">
+        <div class="container">
+            <small>Análise automática gerada em {{ last_updated or "N/A" }}</small>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
