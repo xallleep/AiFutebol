@@ -5,13 +5,11 @@ services:
     python:
       version: "3.9.16"
     buildCommand: |
+      pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
-      python -c "from app import init_db; init_db()"
-    startCommand: gunicorn app:app
+    startCommand: gunicorn --worker-tmp-dir /dev/shm app:app
     envVars:
       - key: FOOTBALL_DATA_API_KEY
-        description: "Chave para a API Football-Data.org"
+        description: "Chave da API Football-Data"
       - key: ALTERNATIVE_FOOTBALL_API_KEY
-        description: "Chave alternativa para API de futebol"
-      - key: PYTHON_VERSION
-        value: "3.9.16"
+        description: "Chave alternativa (opcional)"
