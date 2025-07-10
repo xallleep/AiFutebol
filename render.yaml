@@ -13,3 +13,5 @@ services:
         description: "Chave da API Football-Data"
       - key: ALTERNATIVE_FOOTBALL_API_KEY
         description: "Chave alternativa (opcional)"
+      - key: SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL
+        value: "True"
