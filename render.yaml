@@ -5,8 +5,8 @@ services:
     python:
       version: "3.9.16"
     buildCommand: |
-      pip install --upgrade pip setuptools wheel
-      pip install -r requirements.txt
+      python -m pip install --upgrade pip setuptools wheel
+      pip install -r requirements.txt --no-cache-dir
     startCommand: gunicorn --worker-tmp-dir /dev/shm app:app
     envVars:
       - key: FOOTBALL_DATA_API_KEY
