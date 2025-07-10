@@ -4,3 +4,7 @@ apscheduler==3.10.1
 flask-caching==2.1.0
 python-dotenv==1.0.0
 gunicorn==20.1.0
+pandas==1.5.3
+scikit-learn==1.2.2
+joblib==1.2.0
+numpy==1.24.3

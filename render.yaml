@@ -1,11 +1,17 @@
 services:
   - type: web
-    name: futebol-analise
+    name: alpha-ai-football
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    python:
+      version: "3.9.16"
+    buildCommand: |
+      pip install -r requirements.txt
+      python -c "from app import init_db; init_db()"
     startCommand: gunicorn app:app
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.9.16
       - key: FOOTBALL_DATA_API_KEY
-        value: 649cf8ffe83e4d43bf84371461b70a4e
+        description: "Chave para a API Football-Data.org"
+      - key: ALTERNATIVE_FOOTBALL_API_KEY
+        description: "Chave alternativa para API de futebol"
+      - key: PYTHON_VERSION
+        value: "3.9.16"
