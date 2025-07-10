@@ -10,8 +10,6 @@ services:
     startCommand: gunicorn --worker-tmp-dir /dev/shm app:app
     envVars:
       - key: FOOTBALL_DATA_API_KEY
-        description: "Chave da API Football-Data"
+        description: "Chave para a API Football-Data.org"
       - key: ALTERNATIVE_FOOTBALL_API_KEY
-        description: "Chave alternativa (opcional)"
-      - key: SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL
-        value: "True"
+        description: "Chave alternativa para API de futebol"
