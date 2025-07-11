@@ -3,271 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚽ Alpha AI Football - Previsões Inteligentes</title>
+    <title>Análise de Futebol - Palpites do Dia</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #1a252f;
-        }
-        
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: #f8f9fa;
-            color: var(--dark);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, var(--primary), #1a252f);
-            color: white;
-            padding: 2.5rem 0;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.15);
-            border-bottom: 4px solid var(--secondary);
-        }
-        
         .match-card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-            margin-bottom: 2.5rem;
-            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
             overflow: hidden;
         }
-        
-        .match-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-        }
-        
         .match-header {
-            background: linear-gradient(to right, var(--primary), #34495e);
+            background-color: #343a40;
             color: white;
-            padding: 1.2rem;
-            border-bottom: 3px solid var(--secondary);
+            padding: 1rem;
         }
-        
-        .prediction-badge {
+        .today-header {
+            background-color: #0d6efd;
+        }
+        .tomorrow-header {
+            background-color: #6c757d;
+        }
+        .team-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .vs {
             font-size: 1.2rem;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            font-weight: 600;
+            margin: 0 1rem;
         }
-        
+        .prediction-card {
+            border-left: 4px solid #0d6efd;
+            margin-bottom: 1rem;
+        }
         .stat-card {
-            border-left: 4px solid var(--secondary);
-            transition: all 0.3s;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
-        
-        .stat-card:hover {
-            transform: scale(1.03);
-            background-color: rgba(52, 152, 219, 0.05);
+        .stat-value {
+            font-weight: bold;
+            color: #0d6efd;
         }
-        
-        .player-badge {
-            display: inline-block;
-            margin: 0.25rem;
-            padding: 0.4rem 0.8rem;
-            background: rgba(236, 240, 241, 0.7);
-            border-radius: 20px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            border: 1px solid #ddd;
+        .player-list {
+            column-count: 2;
         }
-        
-        .player-badge:hover {
-            background: var(--secondary);
-            color: white;
-            transform: scale(1.05);
-        }
-        
-        .last-updated {
-            font-size: 0.85rem;
-            opacity: 0.8;
-        }
-        
-        footer {
-            margin-top: auto;
-            background: linear-gradient(to right, var(--dark), #2c3e50);
-            color: white;
-            padding: 1.5rem 0;
-            border-top: 4px solid var(--accent);
-        }
-        
-        .data-source {
-            font-size: 0.8rem;
-            opacity: 0.7;
-            margin-top: 0.5rem;
-        }
-        
         @media (max-width: 768px) {
-            .player-column {
-                margin-bottom: 1.8rem;
+            .player-list {
+                column-count: 1;
             }
-            
-            .header {
-                padding: 1.8rem 0;
-            }
+        }
+        .day-separator {
+            border-top: 3px solid #0d6efd;
+            margin: 2rem 0;
+            position: relative;
+        }
+        .day-separator-text {
+            background: white;
+            padding: 0 1rem;
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            color: #0d6efd;
         }
     </style>
 </head>
-<body>
-    <div class="header text-center">
-        <div class="container">
-            <div class="d-flex justify-content-center align-items-center mb-2">
-                <i class="bi bi-robot fs-1 me-3"></i>
-                <h1 class="display-4 mb-0">Alpha AI Football</h1>
-            </div>
-            <p class="lead mb-1">Previsões inteligentes geradas por IA</p>
-            <small class="text-white-50 last-updated">
-                <i class="bi bi-clock-history me-1"></i> Última atualização: {{ last_updated or "N/A" }}
-            </small>
-        </div>
-    </div>
-
-    <div class="container py-4 flex-grow-1">
+<body class="bg-light">
+    <div class="container py-4">
+        <h1 class="text-center mb-4">⚽ Análise de Futebol - Palpites</h1>
+        
         {% if matches %}
-            <div class="row g-4">
-                {% for match in matches %}
-                <div class="col-lg-6">
-                    <div class="card match-card h-100">
-                        <div class="card-header match-header text-white">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">{{ match.competition }}</h4>
-                                <span class="badge bg-secondary">
-                                    <i class="bi bi-calendar-event me-1"></i>{{ match.date }}
-                                </span>
-                            </div>
-                            <div class="text-start mt-2">
-                                <small><i class="bi bi-clock me-1"></i>{{ match.time }} (Horário de Brasília)</small>
-                            </div>
-                        </div>
-                        
-                        <div class="card-body">
-                            <div class="d-flex justify-content-center align-items-center mb-4">
-                                <div class="text-center">
-                                    <div class="d-flex align-items-center justify-content-center">
-                                        <span class="badge bg-primary p-2 fs-5">{{ match.home_team }}</span>
-                                        <span class="mx-3 fs-4 fw-bold">vs</span>
-                                        <span class="badge bg-danger p-2 fs-5">{{ match.away_team }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <h5 class="text-center mb-3 text-accent">
-                                <i class="bi bi-magic me-2"></i>Previsão do Sistema
-                            </h5>
-                            
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-4">
-                                    <div class="p-3 text-center stat-card h-100">
-                                        <h6><i class="bi bi-123 me-1"></i>Placar</h6>
-                                        <span class="badge prediction-badge bg-success mt-2">{{ match.prediction.score }}</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="p-3 text-center stat-card h-100">
-                                        <h6><i class="bi bi-flag me-1"></i>Escanteios</h6>
-                                        <span class="badge prediction-badge bg-warning text-dark mt-2">{{ match.prediction.corners }}</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="p-3 text-center stat-card h-100">
-                                        <h6><i class="bi bi-card-text me-1"></i>Cartões</h6>
-                                        <span class="badge prediction-badge bg-danger mt-2">{{ match.prediction.cards }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row mt-3">
-                                <div class="col-md-6 player-column">
-                                    <h5 class="text-center mb-3">
-                                        <i class="bi bi-people-fill text-danger me-2"></i>{{ match.home_team }}
-                                    </h5>
-                                    <div class="text-center">
-                                        {% for player in match.lineup_home %}
-                                            <span class="player-badge">{{ player }}</span>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                                <div class="col-md-6 player-column">
-                                    <h5 class="text-center mb-3">
-                                        <i class="bi bi-people-fill text-primary me-2"></i>{{ match.away_team }}
-                                    </h5>
-                                    <div class="text-center">
-                                        {% for player in match.lineup_away %}
-                                            <span class="player-badge">{{ player }}</span>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card-footer bg-light text-center">
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle me-1"></i>Previsões geradas por inteligência artificial
-                            </small>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
+            <h2 class="text-center mb-3">Jogos de Hoje</h2>
+            {% for match in matches if match.is_today %}
+                {% include 'match_card.html' %}
+            {% endfor %}
+            
+            <div class="day-separator">
+                <span class="day-separator-text">Jogos de Amanhã</span>
             </div>
+            
+            {% for match in matches if not match.is_today %}
+                {% include 'match_card.html' %}
+            {% endfor %}
         {% else %}
-            <div class="alert alert-warning text-center py-4">
-                <i class="bi bi-exclamation-triangle-fill fs-1 d-block mb-3"></i>
-                <h4 class="alert-heading">⏳ Nenhum jogo encontrado</h4>
-                <p>Estamos atualizando nossas análises. Por favor, volte em breve.</p>
-                <hr>
-                <p class="mb-0">Atualizações automáticas a cada 6 horas</p>
+            <div class="alert alert-warning text-center">
+                Nenhum jogo encontrado para hoje ou amanhã.
             </div>
         {% endif %}
+        
+        <div class="text-end text-muted mt-4">
+            Última atualização: {{ last_updated }}
+        </div>
     </div>
 
-    <footer class="bg-dark text-white py-4">
-        <div class="container text-center">
-            <h4 class="mb-3">Alpha AI Football</h4>
-            <p class="mb-2">Inteligência Artificial aplicada ao futebol</p>
-            
-            <div class="d-flex justify-content-center gap-3 mb-3">
-                <a href="tel:+5511994545930" class="text-white text-decoration-none">
-                    <i class="bi bi-telephone-fill me-1"></i> SAC: 11 99454-5930
-                </a>
-                <a href="https://instagram.com/AlphaAIFootball" target="_blank" class="text-white text-decoration-none">
-                    <i class="bi bi-instagram me-1"></i> @AlphaAIFootball
-                </a>
-            </div>
-            
-            <div class="data-source">
-                <small>
-                    <i class="bi bi-database me-1"></i>Dados atualizados em {{ last_updated or "N/A" }}
-                    {% if matches and 'Mock' in matches[0]['competition'] %}
-                        <span class="d-block mt-1"><i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>Usando dados simulados</span>
-                    {% endif %}
-                </small>
-            </div>
-        </div>
-    </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Atualiza a página a cada 30 minutos para pegar novos dados
-        setTimeout(() => {
-            window.location.reload();
-        }, 30 * 60 * 1000);
-        
-        // Tooltips
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipTriggerList.map(tooltipTriggerEl => {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        });
-    </script>
 </body>
 </html>
