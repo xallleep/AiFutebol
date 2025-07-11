@@ -2,158 +2,169 @@ from flask import Flask, render_template
 from datetime import datetime, timedelta
 import os
 import requests
+import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
+import random
 
-load_dotenv()  # Carrega variáveis de ambiente do arquivo .env
+load_dotenv()
 
 app = Flask(__name__)
+
+# Configurações
+API_KEY = os.getenv('FOOTBALL_DATA_API_KEY')
+TIMEZONE = 'America/Sao_Paulo'
+MATCHES_PER_DAY = 5  # 5 jogos por dia
 
 # Variáveis globais
 matches_data = []
 last_updated = None
-API_KEY = os.getenv('FOOTBALL_DATA_API_KEY')
 
-def get_today_matches():
-    """Obtém os jogos de hoje e amanhã usando a API Football-Data"""
+def get_priority(competition_name):
+    """Define prioridade das competições"""
+    priority_map = {
+        'Premier League': 10,
+        'Champions League': 10,
+        'Brasileirão': 9,
+        'Copa do Brasil': 8,
+        'Libertadores': 9,
+        'Europa League': 7,
+        'La Liga': 8,
+        'Bundesliga': 8,
+        'Serie A': 7,
+        'Ligue 1': 7
+    }
+    for key, value in priority_map.items():
+        if key in competition_name:
+            return value
+    return 5  # Prioridade padrão
+
+def fetch_matches():
+    """Busca jogos da API"""
     headers = {'X-Auth-Token': API_KEY}
-    base_url = "https://api.football-data.org/v4/matches"
-    
     try:
-        # Obter jogos para hoje e amanhã
-        date_from = datetime.now().strftime('%Y-%m-%d')
-        date_to = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+        tz = pytz.timezone(TIMEZONE)
+        today = datetime.now(tz)
+        tomorrow = today + timedelta(days=1)
+        
+        # Formata datas para API
+        date_from = today.strftime('%Y-%m-%d')
+        date_to = tomorrow.strftime('%Y-%m-%d')
         
         response = requests.get(
-            f"{base_url}?dateFrom={date_from}&dateTo={date_to}",
-            headers=headers
+            f"https://api.football-data.org/v4/matches?dateFrom={date_from}&dateTo={date_to}",
+            headers=headers,
+            timeout=10
         )
         response.raise_for_status()
-        
-        matches = response.json().get('matches', [])
-        
-        # Processar os jogos
-        processed_matches = []
-        for match in matches[:10]:  # Limitar a 10 jogos (5 de hoje e 5 de amanhã)
-            processed_match = process_match_data(match)
-            processed_matches.append(processed_match)
-        
-        # Ordenar por data e selecionar os melhores jogos
-        processed_matches.sort(key=lambda x: x['timestamp'])
-        today_matches = [m for m in processed_matches if m['is_today']][:5]
-        tomorrow_matches = [m for m in processed_matches if not m['is_today']][:5]
-        
-        return today_matches + tomorrow_matches
+        return response.json().get('matches', [])
     
     except Exception as e:
-        print(f"Erro na API: {e}")
+        print(f"Erro na API: {str(e)}")
         return []
 
-def process_match_data(match):
-    """Processa os dados brutos de um jogo"""
-    match_date = datetime.strptime(match['utcDate'], '%Y-%m-%dT%H:%M:%SZ')
-    is_today = match_date.date() == datetime.now().date()
+def select_top_matches(matches):
+    """Seleciona os melhores jogos"""
+    tz = pytz.timezone(TIMEZONE)
+    now = datetime.now(tz)
     
-    home_team = match['homeTeam']['name']
-    away_team = match['awayTeam']['name']
+    # Classifica jogos por prioridade
+    for match in matches:
+        match['priority'] = get_priority(match['competition']['name'])
     
-    # Gerar previsões
-    predictions = generate_predictions(home_team, away_team)
+    # Separa jogos de hoje e amanhã
+    today_matches = []
+    tomorrow_matches = []
+    
+    for match in matches:
+        match_date = datetime.strptime(match['utcDate'], '%Y-%m-%dT%H:%M:%SZ').astimezone(tz)
+        if match_date.date() == now.date():
+            today_matches.append(match)
+        else:
+            tomorrow_matches.append(match)
+    
+    # Ordena por prioridade e seleciona os melhores
+    today_matches.sort(key=lambda x: (-x['priority'], x['utcDate']))
+    tomorrow_matches.sort(key=lambda x: (-x['priority'], x['utcDate']))
+    
+    return today_matches[:MATCHES_PER_DAY], tomorrow_matches[:MATCHES_PER_DAY]
+
+def process_match(match):
+    """Processa dados de um jogo"""
+    tz = pytz.timezone(TIMEZONE)
+    match_date = datetime.strptime(match['utcDate'], '%Y-%m-%dT%H:%M:%SZ').astimezone(tz)
     
     return {
-        'home_team': home_team,
-        'away_team': away_team,
+        'home_team': match['homeTeam']['name'],
+        'away_team': match['awayTeam']['name'],
         'date': match_date.strftime("%d/%m/%Y"),
         'time': match_date.strftime("%H:%M"),
-        'timestamp': match_date.timestamp(),
-        'is_today': is_today,
         'competition': match['competition']['name'],
-        'lineup_home': generate_lineup(home_team),
-        'lineup_away': generate_lineup(away_team),
-        **predictions
+        'is_today': match_date.date() == datetime.now(tz).date(),
+        'lineup_home': generate_lineup(match['homeTeam']['name']),
+        'lineup_away': generate_lineup(match['awayTeam']['name']),
+        **generate_predictions(match['homeTeam']['name'], match['awayTeam']['name'])
     }
 
 def generate_lineup(team_name):
-    """Gera uma escalação simulada baseada no nome do time"""
+    """Gera escalação simulada"""
     positions = ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'FW', 'FW', 'FW']
-    return [f"{pos} {team_name.split()[0]} {i+1}" for i, pos in enumerate(positions)]
+    return [f"{pos} {team_name.split()[0][:3].upper()}{i+1}" for i, pos in enumerate(positions)]
 
-def generate_predictions(home_team, away_team):
-    """Gera previsões baseadas em estatísticas simuladas mas realistas"""
-    # Fatores baseados nos nomes dos times para consistência
-    home_factor = sum(ord(c) for c in home_team) % 10 / 10
-    away_factor = sum(ord(c) for c in away_team) % 10 / 10
+def generate_predictions(home, away):
+    """Gera previsões realistas"""
+    # Fatores baseados nos nomes (para consistência)
+    home_factor = sum(ord(c) for c in home) % 100 / 100
+    away_factor = sum(ord(c) for c in away) % 100 / 100
     
-    # Estatísticas base
-    base_stats = {
-        'possession': 50 + (home_factor - away_factor) * 10,
-        'home_shots': int(12 + home_factor * 6),
-        'away_shots': int(10 + away_factor * 5),
-        'home_corners': int(5 + home_factor * 3),
-        'away_corners': int(4 + away_factor * 2),
-        'fouls': random.randint(10, 20),
-        'cards': random.randint(2, 5)
-    }
-    
-    # Ajustes para tornar mais realista
-    if base_stats['possession'] > 65:
-        base_stats['home_shots'] += 2
-        base_stats['away_shots'] = max(5, base_stats['away_shots'] - 2)
-    elif base_stats['possession'] < 35:
-        base_stats['away_shots'] += 2
-        base_stats['home_shots'] = max(5, base_stats['home_shots'] - 2)
-    
-    # Previsão de gols
-    home_goals = min(
-        int(base_stats['home_shots'] * (0.1 + home_factor * 0.05)),
-        random.randint(0, 4)
-    )
-    away_goals = min(
-        int(base_stats['away_shots'] * (0.1 + away_factor * 0.05)),
-        random.randint(0, 3)
-    )
+    # Cálculo das estatísticas
+    diff = home_factor - away_factor
     
     return {
-        'predicted_score': f"{home_goals}-{away_goals}",
-        'predicted_corners': base_stats['home_corners'] + base_stats['away_corners'],
-        'predicted_cards': base_stats['cards'],
+        'predicted_score': f"{int(1 + home_factor * 3)}-{int(1 + away_factor * 2)}",
+        'predicted_corners': int(5 + (home_factor + away_factor) * 5),
+        'predicted_cards': int(2 + abs(diff) * 4),
         'stats': {
-            'posse_bola': f"{base_stats['possession']:.0f}%-{100 - base_stats['possession']:.0f}%",
-            'chutes': f"{base_stats['home_shots']}-{base_stats['away_shots']}",
-            'chutes_gol': f"{int(base_stats['home_shots'] * 0.4)}-{int(base_stats['away_shots'] * 0.3)}",
-            'faltas': f"{base_stats['fouls']}-{int(base_stats['fouls'] * 0.9)}"
+            'posse_bola': f"{int(50 + diff * 30)}%-{int(50 - diff * 30)}%",
+            'chutes': f"{int(8 + home_factor * 8)}-{int(7 + away_factor * 7)}",
+            'chutes_gol': f"{int(3 + home_factor * 4)}-{int(2 + away_factor * 3)}",
+            'faltas': f"{int(10 + home_factor * 5)}-{int(9 + away_factor * 5)}"
         }
     }
 
-def update_data():
+def update_matches():
     """Atualiza os dados dos jogos"""
     global matches_data, last_updated
-    print("Atualizando dados...")
+    
+    print("Atualizando dados dos jogos...")
     try:
-        matches_data = get_today_matches()
-        last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"Dados atualizados com sucesso! {len(matches_data)} jogos encontrados.")
+        matches = fetch_matches()
+        if not matches:
+            print("Nenhum jogo encontrado")
+            return
+        
+        today, tomorrow = select_top_matches(matches)
+        processed = [process_match(m) for m in today + tomorrow]
+        
+        matches_data = processed
+        last_updated = datetime.now(pytz.timezone(TIMEZONE)).strftime("%d/%m/%Y %H:%M")
+        print(f"Dados atualizados: {len(today)} hoje, {len(tomorrow)} amanhã")
+        
     except Exception as e:
-        print(f"Erro ao atualizar dados: {e}")
+        print(f"Erro na atualização: {str(e)}")
 
 @app.route('/')
 def index():
-    return render_template('index.html', matches=matches_data, last_updated=last_updated)
+    return render_template('index.html',
+                         matches=matches_data,
+                         last_updated=last_updated)
 
-def scheduled_task():
-    """Tarefa agendada para atualizar dados"""
-    with app.app_context():
-        update_data()
+# Agendador
+scheduler = BackgroundScheduler()
+scheduler.add_job(update_matches, 'interval', hours=6)
+scheduler.start()
 
 if __name__ == '__main__':
-    # Atualiza os dados imediatamente ao iniciar
-    update_data()
-    
-    # Configura o agendador para atualizar a cada 6 horas
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=scheduled_task, trigger="interval", hours=6)
-    scheduler.start()
-    
-    # Configuração para o Render
+    update_matches()  # Atualiza ao iniciar
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
