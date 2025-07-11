@@ -1,94 +1,81 @@
-<div class="card match-card">
-    <div class="card-header match-header {% if match.is_today %}today-header{% else %}tomorrow-header{% endif %} text-center">
-        <h3>{{ match.competition }}</h3>
-        <div class="d-flex justify-content-center align-items-center">
+<div class="card match-card {% if match.is_today %}today-card{% else %}tomorrow-card{% endif %}">
+    <div class="match-header text-center">
+        <div class="competition-badge">{{ match.competition[:20] }}{% if match.competition|length > 20 %}...{% endif %}</div>
+        <div class="d-flex justify-content-center align-items-center my-2">
             <div class="team-name text-end">{{ match.home_team }}</div>
-            <div class="vs">vs</div>
+            <div class="vs-circle">VS</div>
             <div class="team-name text-start">{{ match.away_team }}</div>
         </div>
-        <div class="text-light">{{ match.date }} às {{ match.time }}</div>
+        <div class="text-light">
+            <i class="bi bi-clock"></i> {{ match.time }} | {{ match.date }}
+        </div>
     </div>
     
     <div class="card-body">
+        <!-- Previsões -->
         <div class="row">
             <div class="col-md-4">
-                <div class="card prediction-card">
+                <div class="card prediction-card h-100">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Palpite de Placar</h5>
-                        <h2 class="text-primary">{{ match.predicted_score }}</h2>
+                        <h6 class="card-title text-muted">PLACAR PREVISTO</h6>
+                        <h2 class="mb-0" style="color: var(--accent);">{{ match.predicted_score }}</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card prediction-card">
+                <div class="card prediction-card h-100">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Escanteios</h5>
-                        <h2 class="text-primary">{{ match.predicted_corners }}</h2>
+                        <h6 class="card-title text-muted">ESCANTEIOS</h6>
+                        <h2 class="mb-0" style="color: var(--accent);">{{ match.predicted_corners }}</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card prediction-card">
+                <div class="card prediction-card h-100">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Cartões Amarelos</h5>
-                        <h2 class="text-primary">{{ match.predicted_cards }}</h2>
+                        <h6 class="card-title text-muted">CARTÕES</h6>
+                        <h2 class="mb-0" style="color: var(--accent);">{{ match.predicted_cards }}</h2>
                     </div>
                 </div>
             </div>
         </div>
         
-        <h4 class="mt-4">📊 Estatísticas Previstas</h4>
+        <!-- Estatísticas -->
+        <h5 class="mt-4"><i class="bi bi-bar-chart-line"></i> Estatísticas Previstas</h5>
         <div class="row">
-            <div class="col-md-6">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between">
-                        <span>Posse de Bola:</span>
-                        <span class="stat-value">{{ match.stats.posse_bola }}</span>
+            {% for stat, value in match.stats.items() %}
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between">
+                            <span>{{ stat|replace('_', ' ')|title }}:</span>
+                            <span class="stat-value">{{ value }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between">
-                        <span>Chutes no Gol:</span>
-                        <span class="stat-value">{{ match.stats.chutes_gol }}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between">
-                        <span>Total de Chutes:</span>
-                        <span class="stat-value">{{ match.stats.chutes }}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between">
-                        <span>Faltas Cometidas:</span>
-                        <span class="stat-value">{{ match.stats.faltas }}</span>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
         
-        <div class="row mt-4">
+        <!-- Escalações -->
+        <div class="row mt-3">
             <div class="col-md-6">
-                <h4>🔴 {{ match.home_team }} - Escalação</h4>
-                <ul class="player-list">
-                    {% for player in match.lineup_home %}
-                        <li>{{ player }}</li>
-                    {% endfor %}
-                </ul>
+                <div class="player-card">
+                    <h5><i class="bi bi-people-fill" style="color: var(--today);"></i> {{ match.home_team }}</h5>
+                    <ul class="player-list list-unstyled">
+                        {% for player in match.lineup_home %}
+                            <li class="player-item">{{ player }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
             <div class="col-md-6">
-                <h4>🔵 {{ match.away_team }} - Escalação</h4>
-                <ul class="player-list">
-                    {% for player in match.lineup_away %}
-                        <li>{{ player }}</li>
-                    {% endfor %}
-                </ul>
+                <div class="player-card">
+                    <h5><i class="bi bi-people-fill" style="color: var(--tomorrow);"></i> {{ match.away_team }}</h5>
+                    <ul class="player-list list-unstyled">
+                        {% for player in match.lineup_away %}
+                            <li class="player-item">{{ player }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
