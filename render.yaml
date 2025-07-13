@@ -4,13 +4,14 @@ services:
     runtime: python
     pythonVersion: "3.10.13"
     buildCommand: |
-      python -m pip install --upgrade "setuptools==68.2.2" "wheel==0.42.0"
-      pip install --no-build-isolation -e .
+      python -m pip install --upgrade pip
       pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.13
-      - key: FOOTBALL_DATA_API_KEY
-        value: ${{FOOTBALL_DATA_API_KEY}}
+      - key: DATA_SOURCE
+        value: scrape
+      - key: FOOTAPI_KEY
+        value: ${{FOOTAPI_KEY}}
     plan: free

@@ -1,19 +1,11 @@
-# Dependências principais
-setuptools==68.2.2  # Versão compatível que ainda inclui pkg_resources
-wheel==0.42.0
-pip==24.0
-
-# Suas dependências
-flask==3.0.2  # Versão atualizada
-requests==2.32.0
+flask==3.0.2
+requests==2.31.0
 beautifulsoup4==4.12.3
 apscheduler==3.10.1
 pytz==2024.1
 numpy==2.0.0
-python-dotenv==1.0.1
+python-dotenv==1.0.0
 gunicorn==21.2.0
 lxml==5.2.0
-
-# Adicione para substituir pkg_resources
-importlib-metadata==7.1.0
-importlib-resources==6.4.0
+fake-useragent==1.3.0
+sqlalchemy==2.0.25

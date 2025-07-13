@@ -13,18 +13,15 @@ app = Flask(__name__)
 
 # Configurações
 TIMEZONE = 'America/Sao_Paulo'
-MATCHES_PER_DAY = 5
+MATCHES_PER_DAY = 10  # Aumentado para capturar mais jogos
 DATA_SOURCE = os.getenv('DATA_SOURCE', 'scrape')
 CACHE_DB = 'matches_cache.db'
 
-# Inicializa o banco de dados
 def init_db():
     conn = sqlite3.connect(CACHE_DB)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS matches
                  (id TEXT PRIMARY KEY, data TEXT, timestamp REAL)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS team_stats
-                 (team TEXT PRIMARY KEY, stats TEXT)''')
     conn.commit()
     conn.close()
 
@@ -53,22 +50,21 @@ def update_data():
         matches = data_processor.get_matches(DATA_SOURCE)
         
         if not matches:
-            print("⚠️ Usando dados simulados como fallback")
-            matches = data_processor.get_matches('mock')
+            print("⚠️ Nenhum jogo encontrado nas fontes principais")
+            matches = data_processor.get_fallback_matches()
         
         matches_data = matches
         last_updated = datetime.now(pytz.timezone(TIMEZONE)).strftime('%d/%m/%Y %H:%M')
-        print("✅ Dados atualizados com sucesso")
+        print(f"✅ Dados atualizados. Jogos hoje: {len([m for m in matches if m['is_today']])}, amanhã: {len([m for m in matches if not m['is_today']])}")
     
     except Exception as e:
         print(f"❌ Erro na atualização: {str(e)}")
 
-# Agendador
 scheduler = BackgroundScheduler()
 scheduler.add_job(update_data, 'interval', hours=1)
 scheduler.start()
 
-# Atualiza os dados na inicialização
+# Atualiza imediatamente ao iniciar
 update_data()
 
 if __name__ == '__main__':
