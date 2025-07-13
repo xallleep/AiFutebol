@@ -2,16 +2,14 @@ services:
   - type: web
     name: futebol-predict
     runtime: python
-    pythonVersion: "3.10.13"
+    pythonVersion: "3.9.16"  # Versão estável
     buildCommand: |
-      python -m pip install --upgrade pip
+      python -m pip install --upgrade "setuptools<66.0.0" wheel
       pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.13
+        value: 3.9.16
       - key: DATA_SOURCE
         value: scrape
-      - key: FOOTAPI_KEY
-        value: ${{FOOTAPI_KEY}}
     plan: free
