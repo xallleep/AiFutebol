@@ -1,6 +1,9 @@
-setuptools==65.5.1  # Versão compatível
-wheel==0.42.0
+# Dependências essenciais
+setuptools==65.5.1
+wheel==0.38.4
+pip==23.0.1
 
+# Suas dependências
 flask==2.3.2
 requests==2.31.0
 beautifulsoup4==4.12.2
