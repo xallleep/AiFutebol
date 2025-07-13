@@ -1,3 +1,6 @@
 [build-system]
-requires = ["setuptools>=68.2.2", "wheel>=0.41.3"]
+requires = ["setuptools==80.0.0", "wheel==0.42.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = []

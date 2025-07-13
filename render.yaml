@@ -2,14 +2,15 @@ services:
   - type: web
     name: futebol-predict
     runtime: python
-    pythonVersion: "3.9.16"  # Adicione esta linha
+    pythonVersion: "3.10.13"  # Versão mais estável em 2025
     buildCommand: |
-      python -m pip install --upgrade pip==23.0.1 setuptools==68.2.2 wheel==0.41.3
+      python -m pip install --upgrade "setuptools<81.0.0" wheel
+      pip install --upgrade pip
       pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9.16
+        value: 3.10.13
       - key: FOOTBALL_DATA_API_KEY
         value: ${{FOOTBALL_DATA_API_KEY}}
       - key: DATA_SOURCE
