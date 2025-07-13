@@ -1,5 +1,5 @@
 # Dependências principais
-setuptools==80.0.0  # Versão compatível que ainda inclui pkg_resources
+setuptools==68.2.2  # Versão compatível que ainda inclui pkg_resources
 wheel==0.42.0
 pip==24.0
 

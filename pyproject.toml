@@ -1,6 +1,8 @@
 [build-system]
-requires = ["setuptools==80.0.0", "wheel==0.42.0"]
+requires = ["setuptools==68.2.2", "wheel==0.42.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = []
+# Otimizações para builds no Render
+zip-safe = false
+include-package-data = true
