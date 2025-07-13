@@ -1,7 +1,9 @@
+# Dependências essenciais
 setuptools==68.2.2
 wheel==0.41.3
-pip==23.3.1
+pip==23.0.1
 
+# Suas dependências
 flask==2.3.2
 requests==2.31.0
 beautifulsoup4==4.12.2
