@@ -2,10 +2,10 @@ services:
   - type: web
     name: futebol-predict
     runtime: python
-    pythonVersion: "3.9.16"  # Deve corresponder ao runtime.txt
+    pythonVersion: "3.9.16"
     buildCommand: |
       python -m pip install --upgrade "setuptools==65.5.1" "wheel==0.38.4"
-      pip install --no-cache-dir -r requirements.txt
+      pip install --no-build-isolation -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
