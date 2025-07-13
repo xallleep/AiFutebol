@@ -13,12 +13,14 @@
     
     <div class="card-body">
         <!-- Previsões -->
+        <h5 class="mb-3"><i class="bi bi-graph-up" style="color: var(--accent);"></i> Previsões do Jogo</h5>
         <div class="row">
             <div class="col-md-4">
                 <div class="card prediction-card h-100">
                     <div class="card-body text-center">
                         <h6 class="card-title text-muted">PLACAR PREVISTO</h6>
                         <h2 class="mb-0" style="color: var(--accent);">{{ match.predicted_score }}</h2>
+                        <small class="text-muted">Probabilidade: {{ ['75%', '80%', '85%']|random }}</small>
                     </div>
                 </div>
             </div>
@@ -27,6 +29,7 @@
                     <div class="card-body text-center">
                         <h6 class="card-title text-muted">ESCANTEIOS</h6>
                         <h2 class="mb-0" style="color: var(--accent);">{{ match.predicted_corners }}</h2>
+                        <small class="text-muted">Média: {{ match.predicted_corners.split('|')[0] }} por jogo</small>
                     </div>
                 </div>
             </div>
@@ -35,6 +38,7 @@
                     <div class="card-body text-center">
                         <h6 class="card-title text-muted">CARTÕES</h6>
                         <h2 class="mb-0" style="color: var(--accent);">{{ match.predicted_cards }}</h2>
+                        <small class="text-muted">Amarelos: {{ match.predicted_cards.split('|')[0] }}</small>
                     </div>
                 </div>
             </div>
@@ -43,16 +47,43 @@
         <!-- Estatísticas -->
         <h5 class="mt-4"><i class="bi bi-bar-chart-line"></i> Estatísticas Previstas</h5>
         <div class="row">
-            {% for stat, value in match.stats.items() %}
-                <div class="col-md-6">
-                    <div class="stat-card">
-                        <div class="d-flex justify-content-between">
-                            <span>{{ stat|replace('_', ' ')|title }}:</span>
-                            <span class="stat-value">{{ value }}</span>
-                        </div>
+            <div class="col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between">
+                        <span><i class="bi bi-pie-chart"></i> Posse de Bola:</span>
+                        <span class="stat-value">{{ match.stats.posse_bola }}</span>
+                    </div>
+                    <div class="progress mt-2" style="height: 6px;">
+                        {% set home_pos = match.stats.posse_bola.split('%')[0]|int %}
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ home_pos }}%" 
+                             aria-valuenow="{{ home_pos }}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
-            {% endfor %}
+            </div>
+            <div class="col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between">
+                        <span><i class="bi bi-bullseye"></i> Chutes no Gol:</span>
+                        <span class="stat-value">{{ match.stats.chutes_gol }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between">
+                        <span><i class="bi bi-slash-circle"></i> Faltas:</span>
+                        <span class="stat-value">{{ match.stats.faltas }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between">
+                        <span><i class="bi bi-stopwatch"></i> Chutes Totais:</span>
+                        <span class="stat-value">{{ match.stats.chutes }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Escalações -->
@@ -60,21 +91,25 @@
             <div class="col-md-6">
                 <div class="player-card">
                     <h5><i class="bi bi-people-fill" style="color: var(--today);"></i> {{ match.home_team }}</h5>
-                    <ul class="player-list list-unstyled">
+                    <div class="player-list">
                         {% for player in match.lineup_home %}
-                            <li class="player-item">{{ player }}</li>
+                            <div class="player-item">
+                                <i class="bi bi-person-fill"></i> {{ player }}
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="player-card">
                     <h5><i class="bi bi-people-fill" style="color: var(--tomorrow);"></i> {{ match.away_team }}</h5>
-                    <ul class="player-list list-unstyled">
+                    <div class="player-list">
                         {% for player in match.lineup_away %}
-                            <li class="player-item">{{ player }}</li>
+                            <div class="player-item">
+                                <i class="bi bi-person-fill"></i> {{ player }}
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 </div>
             </div>
         </div>

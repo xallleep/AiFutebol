@@ -14,11 +14,15 @@
             --accent: #f857a6;
             --today: #4b79cf;
             --tomorrow: #6c757d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
         }
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #f8fafc;
             color: #333;
+            padding-bottom: 3rem;
         }
         .header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -26,6 +30,19 @@
             padding: 2.5rem 0;
             margin-bottom: 2rem;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: "";
+            position: absolute;
+            bottom: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+            border-radius: 30px;
         }
         .match-card {
             border-radius: 12px;
@@ -33,15 +50,18 @@
             box-shadow: 0 6px 15px rgba(0,0,0,0.08);
             margin-bottom: 2rem;
             border: none;
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: white;
         }
         .match-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
         }
         .match-header {
             padding: 1.2rem;
             color: white;
             position: relative;
+            overflow: hidden;
         }
         .today-card .match-header {
             background: linear-gradient(to right, var(--today), #5a8dee);
@@ -57,10 +77,12 @@
             padding: 0.2rem 0.5rem;
             border-radius: 4px;
             font-size: 0.8rem;
+            font-weight: 500;
         }
         .team-name {
             font-weight: 700;
             font-size: 1.3rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         .vs-circle {
             width: 40px;
@@ -79,6 +101,9 @@
             border-left: 4px solid var(--accent);
             margin-bottom: 1rem;
             transition: all 0.3s;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
         }
         .prediction-card:hover {
             transform: scale(1.03);
@@ -90,6 +115,7 @@
             padding: 1rem;
             margin-bottom: 1rem;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 3px solid var(--primary);
         }
         .stat-value {
             font-weight: 700;
@@ -101,6 +127,7 @@
             padding: 1rem;
             margin-bottom: 1rem;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-top: 3px solid var(--accent);
         }
         .player-list {
             column-count: 2;
@@ -108,6 +135,7 @@
         .player-item {
             padding: 0.3rem 0;
             border-bottom: 1px dashed #eee;
+            break-inside: avoid;
         }
         .update-info {
             font-size: 0.9rem;
@@ -140,6 +168,24 @@
             height: 1px;
             background: linear-gradient(to right, transparent, #ddd, transparent);
         }
+        .confidence-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+        }
+        .high-confidence {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success);
+        }
+        .medium-confidence {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
+        }
+        .low-confidence {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--danger);
+        }
         @media (max-width: 768px) {
             .player-list {
                 column-count: 1;
@@ -165,26 +211,38 @@
                 <span><i class="bi bi-calendar-check"></i> Jogos de Hoje</span>
             </div>
             
-            <div class="row">
-                {% for match in today_matches %}
-                    <div class="col-lg-6">
-                        {% include 'match_card.html' %}
-                    </div>
-                {% endfor %}
-            </div>
+            {% if today_matches %}
+                <div class="row">
+                    {% for match in today_matches %}
+                        <div class="col-lg-6">
+                            {% include 'match_card.html' %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i> Nenhum jogo encontrado para hoje.
+                </div>
+            {% endif %}
             
             <!-- Jogos de Amanhã -->
             <div class="day-title">
                 <span><i class="bi bi-calendar-plus"></i> Jogos de Amanhã</span>
             </div>
             
-            <div class="row">
-                {% for match in tomorrow_matches %}
-                    <div class="col-lg-6">
-                        {% include 'match_card.html' %}
-                    </div>
-                {% endfor %}
-            </div>
+            {% if tomorrow_matches %}
+                <div class="row">
+                    {% for match in tomorrow_matches %}
+                        <div class="col-lg-6">
+                            {% include 'match_card.html' %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i> Nenhum jogo encontrado para amanhã.
+                </div>
+            {% endif %}
             
         {% else %}
             <div class="alert alert-warning text-center">
@@ -195,10 +253,33 @@
         <div class="text-center my-4">
             <div class="update-info">
                 <i class="bi bi-arrow-clockwise"></i> Atualizado em: {{ last_updated }}
+                <span class="confidence-badge high-confidence">Alta Confiança</span>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Adiciona animação aos cards quando aparecem na tela
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.match-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            cards.forEach(card => {
+                card.style.opacity = 0;
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: futebol-analise
+    name: futebol-predict
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
@@ -9,4 +9,6 @@ services:
         value: 3.9.16
       - key: FOOTBALL_DATA_API_KEY
         value: ${{FOOTBALL_DATA_API_KEY}}
+      - key: DATA_SOURCE
+        value: api # pode ser 'api', 'scrape' ou 'mock'
     plan: free
