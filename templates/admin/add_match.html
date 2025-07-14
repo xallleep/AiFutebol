@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <h2 class="mb-4"><i class="bi bi-plus-circle"></i> Adicionar Novo Jogo</h2>
+    
+    <form method="POST" action="{{ url_for('add_match') }}">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Time da Casa</label>
+                <input type="text" name="home_team" class="form-control" required>
+            </div>
+            
+            <div class="col-md-6">
+                <label class="form-label">Time Visitante</label>
+                <input type="text" name="away_team" class="form-control" required>
+            </div>
+            
+            <div class="col-md-6">
+                <label class="form-label">Competição</label>
+                <input type="text" name="competition" class="form-control">
+            </div>
+            
+            <div class="col-md-6">
+                <label class="form-label">Local</label>
+                <input type="text" name="location" class="form-control">
+            </div>
+            
+            <div class="col-md-6">
+                <label class="form-label">Data</label>
+                <input type="date" name="match_date" class="form-control" required>
+            </div>
+            
+            <div class="col-md-6">
+                <label class="form-label">Hora</label>
+                <input type="time" name="match_time" class="form-control" required>
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">Placar Previsto</label>
+                <input type="text" name="predicted_score" class="form-control" placeholder="Ex: 2-1">
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">Esquema de Cores</label>
+                <select name="color_scheme" class="form-select">
+                    <option value="blue">Azul</option>
+                    <option value="green">Verde</option>
+                    <option value="red">Vermelho</option>
+                    <option value="purple">Roxo</option>
+                    <option value="orange">Laranja</option>
+                </select>
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">Ordem de Exibição</label>
+                <input type="number" name="display_order" class="form-control" value="0">
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">% Vitória Casa</label>
+                <input type="number" name="home_win_percent" class="form-control" min="0" max="100" value="0">
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">% Empate</label>
+                <input type="number" name="draw_percent" class="form-control" min="0" max="100" value="0">
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">% Vitória Visitante</label>
+                <input type="number" name="away_win_percent" class="form-control" min="0" max="100" value="0">
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">% Over 1.5</label>
+                <input type="number" name="over_15_percent" class="form-control" min="0" max="100" value="0">
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">% Over 2.5</label>
+                <input type="number" name="over_25_percent" class="form-control" min="0" max="100" value="0">
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">% Ambos Marcam</label>
+                <input type="number" name="btts_percent" class="form-control" min="0" max="100" value="0">
+            </div>
+            
+            <div class="col-12">
+                <label class="form-label">Análise/Detalhes</label>
+                <textarea name="details" class="form-control" rows="4"></textarea>
+            </div>
+            
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary px-4 py-2">
+                    <i class="bi bi-check-lg"></i> Salvar Jogo
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
