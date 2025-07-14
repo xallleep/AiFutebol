@@ -10,4 +10,6 @@ services:
         value: 3.9.16
       - key: PIP_VERSION
         value: 23.0.1
+      - key: SETUPTOOLS_VERSION
+        value: 65.5.1
     plan: free
