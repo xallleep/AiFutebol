@@ -4,12 +4,11 @@ services:
     runtime: python
     pythonVersion: "3.9.16"
     buildCommand: |
-      python -m pip install --upgrade "setuptools==65.5.1" "wheel==0.38.4"
-      pip install --no-build-isolation --no-cache-dir -r requirements.txt
+      python -m pip install --upgrade pip==23.0.1
+      pip install setuptools==65.5.1 wheel==0.38.4
+      pip install --no-build-isolation -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.16
-      - key: DATA_SOURCE
-        value: scrape
     plan: free
