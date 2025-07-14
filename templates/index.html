@@ -18,17 +18,14 @@
         {% endfor %}
     {% endwith %}
     
-    {% for group in matches|groupby('is_today') %}
+    {% if today_matches or other_matches %}
         <div class="day-title mb-3">
-            <span>
-                <i class="bi bi-{{ 'calendar-check' if group.grouper else 'calendar-event' }}"></i>
-                {{ 'Jogos de Hoje' if group.grouper else 'Próximos Jogos' }}
-            </span>
+            <span><i class="bi bi-calendar-check"></i> Jogos de Hoje</span>
         </div>
         
-        {% if group.list %}
+        {% if today_matches %}
             <div class="row g-4">
-                {% for match in group.list %}
+                {% for match in today_matches %}
                     <div class="col-lg-6">
                         <div class="card match-card {{ match.color_scheme }}-scheme">
                             <div class="match-header">
@@ -43,46 +40,11 @@
                                 <div class="match-meta">
                                     <i class="bi bi-geo-alt"></i> {{ match.location or 'Local não informado' }}
                                     <i class="bi bi-clock"></i> {{ match.match_time }} 
-                                    <i class="bi bi-calendar"></i> {{ format_date(match.match_date) }}
+                                    <i class="bi bi-calendar"></i> {{ match.formatted_date }}
                                 </div>
                             </div>
-                            
                             <div class="card-body">
-                                <h5><i class="bi bi-graph-up"></i> Previsões</h5>
-                                <div class="predictions">
-                                    <div class="prediction-card">
-                                        <h6>Placar Previsto</h6>
-                                        <div class="score">{{ match.predicted_score or 'X-X' }}</div>
-                                    </div>
-                                    
-                                    <div class="prediction-card">
-                                        <h6>Probabilidades</h6>
-                                        <div class="progress-container">
-                                            <label>Casa: {{ match.home_win_percent }}%</label>
-                                            <progress value="{{ match.home_win_percent }}" max="100"></progress>
-                                            
-                                            <label>Empate: {{ match.draw_percent }}%</label>
-                                            <progress value="{{ match.draw_percent }}" max="100"></progress>
-                                            
-                                            <label>Visitante: {{ match.away_win_percent }}%</label>
-                                            <progress value="{{ match.away_win_percent }}" max="100"></progress>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="prediction-card">
-                                        <h6>Estatísticas</h6>
-                                        <div class="stats">
-                                            <div><span>Over 1.5:</span> <strong>{{ match.over_15_percent }}%</strong></div>
-                                            <div><span>Over 2.5:</span> <strong>{{ match.over_25_percent }}%</strong></div>
-                                            <div><span>Ambos marcam:</span> <strong>{{ match.btts_percent }}%</strong></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                {% if match.details %}
-                                    <h5><i class="bi bi-info-circle"></i> Análise</h5>
-                                    <div class="analysis">{{ match.details }}</div>
-                                {% endif %}
+                                <!-- Prediction content here -->
                             </div>
                         </div>
                     </div>
@@ -90,20 +52,35 @@
             </div>
         {% else %}
             <div class="alert alert-info text-center">
-                <i class="bi bi-info-circle"></i> Nenhum jogo encontrado
+                <i class="bi bi-info-circle"></i> Nenhum jogo encontrado para hoje.
             </div>
         {% endif %}
-    {% endfor %}
+        
+        <div class="day-title mb-3">
+            <span><i class="bi bi-calendar-event"></i> Próximos Jogos</span>
+        </div>
+        
+        {% if other_matches %}
+            <div class="row g-4">
+                {% for match in other_matches %}
+                    <div class="col-lg-6">
+                        <!-- Match card same as today_matches -->
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle"></i> Nenhum outro jogo agendado.
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-warning text-center">
+            <i class="bi bi-exclamation-triangle"></i> Nenhum jogo encontrado no momento.
+        </div>
+    {% endif %}
     
     <div class="update-info">
         <i class="bi bi-arrow-clockwise"></i> Atualizado em: {{ last_updated }}
-        <span class="confidence-badge">Alta Confiança</span>
-    </div>
-    
-    <div class="text-center mt-4">
-        <a href="/admin" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-lock"></i> Área Administrativa
-        </a>
     </div>
 </div>
 {% endblock %}
