@@ -1,8 +1,9 @@
-# Dependências de build
+# DEPENDÊNCIAS DE BUILD (OBRIGATÓRIAS)
 setuptools==65.5.1
 wheel==0.38.4
+pip==23.0.1
 
-# Dependências principais
+# DEPENDÊNCIAS PRINCIPAIS
 flask==2.3.2
 requests==2.31.0
 beautifulsoup4==4.12.2
