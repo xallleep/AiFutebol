@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+            <i class="bi bi-speedometer2"></i> Painel Admin
+        </a>
+        <div class="d-flex">
+            <a href="{{ url_for('manage_match') }}" class="btn btn-light btn-sm me-2">
+                <i class="bi bi-plus-lg"></i> Novo
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h2 class="mb-4"><i class="bi bi-calendar-event"></i> Jogos Cadastrados</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show mb-3">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endwith %}
+    
+    {% if matches %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ordem</th>
+                        <th>Partida</th>
+                        <th>Competição</th>
+                        <th>Data/Hora</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in matches %}
+                        <tr>
+                            <td>{{ match.display_order }}</td>
+                            <td>
+                                <strong>{{ match.home_team }} x {{ match.away_team }}</strong>
+                                <div class="text-muted small">{{ match.competition or '-' }}</div>
+                            </td>
+                            <td>{{ format_date(match.match_date) }}<br>{{ match.match_time }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('manage_match', match_id=match.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('manage_match', match_id=match.id) }}"
+                                          onsubmit="return confirm('Tem certeza que deseja excluir este jogo?');">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> Nenhum jogo cadastrado ainda.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

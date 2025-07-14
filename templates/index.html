@@ -1,285 +1,109 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Previsão de Jogos | IA Esportiva</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #2b5876;
-            --secondary: #4e4376;
-            --accent: #f857a6;
-            --today: #4b79cf;
-            --tomorrow: #6c757d;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-        }
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f8fafc;
-            color: #333;
-            padding-bottom: 3rem;
-        }
-        .header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 2.5rem 0;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        .header::after {
-            content: "";
-            position: absolute;
-            bottom: -50px;
-            right: -50px;
-            width: 150px;
-            height: 150px;
-            background: rgba(255,255,255,0.1);
-            transform: rotate(45deg);
-            border-radius: 30px;
-        }
-        .match-card {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-            margin-bottom: 2rem;
-            border: none;
-            transition: transform 0.3s, box-shadow 0.3s;
-            background: white;
-        }
-        .match-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-        }
-        .match-header {
-            padding: 1.2rem;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        .today-card .match-header {
-            background: linear-gradient(to right, var(--today), #5a8dee);
-        }
-        .tomorrow-card .match-header {
-            background: linear-gradient(to right, var(--tomorrow), #868e96);
-        }
-        .competition-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.2);
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        .team-name {
-            font-weight: 700;
-            font-size: 1.3rem;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-        .vs-circle {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 0 1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .prediction-card {
-            border-left: 4px solid var(--accent);
-            margin-bottom: 1rem;
-            transition: all 0.3s;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .prediction-card:hover {
-            transform: scale(1.03);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-        .stat-card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-left: 3px solid var(--primary);
-        }
-        .stat-value {
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .player-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-top: 3px solid var(--accent);
-        }
-        .player-list {
-            column-count: 2;
-        }
-        .player-item {
-            padding: 0.3rem 0;
-            border-bottom: 1px dashed #eee;
-            break-inside: avoid;
-        }
-        .update-info {
-            font-size: 0.9rem;
-            color: #6c757d;
-            background: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            display: inline-block;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .day-title {
-            position: relative;
-            margin: 2rem 0 1.5rem;
-            text-align: center;
-        }
-        .day-title span {
-            background: white;
-            padding: 0 1rem;
-            position: relative;
-            z-index: 1;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .day-title:before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(to right, transparent, #ddd, transparent);
-        }
-        .confidence-badge {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            margin-left: 0.5rem;
-        }
-        .high-confidence {
-            background-color: rgba(40, 167, 69, 0.2);
-            color: var(--success);
-        }
-        .medium-confidence {
-            background-color: rgba(255, 193, 7, 0.2);
-            color: var(--warning);
-        }
-        .low-confidence {
-            background-color: rgba(220, 53, 69, 0.2);
-            color: var(--danger);
-        }
-        @media (max-width: 768px) {
-            .player-list {
-                column-count: 1;
-            }
-            .team-name {
-                font-size: 1.1rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <div class="container text-center">
-            <h1><i class="bi bi-robot"></i> IA Esportiva</h1>
-            <p class="mb-0">Previsões inteligentes para os principais jogos</p>
-        </div>
-    </div>
+{% extends "base.html" %}
 
-    <div class="container">
-        {% if today_matches or tomorrow_matches %}
-            <!-- Jogos de Hoje -->
-            <div class="day-title">
-                <span><i class="bi bi-calendar-check"></i> Jogos de Hoje</span>
+{% block content %}
+<div class="header">
+    <div class="container text-center py-4">
+        <h1><i class="bi bi-robot"></i> IA Esportiva</h1>
+        <p class="mb-0">Previsões inteligentes para os principais jogos</p>
+    </div>
+</div>
+
+<div class="container py-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-            
-            {% if today_matches %}
-                <div class="row">
-                    {% for match in today_matches %}
-                        <div class="col-lg-6">
-                            {% include 'match_card.html' %}
+        {% endfor %}
+    {% endwith %}
+    
+    {% for group in matches|groupby('is_today') %}
+        <div class="day-title mb-3">
+            <span>
+                <i class="bi bi-{{ 'calendar-check' if group.grouper else 'calendar-event' }}"></i>
+                {{ 'Jogos de Hoje' if group.grouper else 'Próximos Jogos' }}
+            </span>
+        </div>
+        
+        {% if group.list %}
+            <div class="row g-4">
+                {% for match in group.list %}
+                    <div class="col-lg-6">
+                        <div class="card match-card {{ match.color_scheme }}-scheme">
+                            <div class="match-header">
+                                {% if match.competition %}
+                                    <div class="competition-badge">{{ match.competition[:20] }}</div>
+                                {% endif %}
+                                <div class="teams">
+                                    <span class="home-team">{{ match.home_team }}</span>
+                                    <span class="vs">VS</span>
+                                    <span class="away-team">{{ match.away_team }}</span>
+                                </div>
+                                <div class="match-meta">
+                                    <i class="bi bi-geo-alt"></i> {{ match.location or 'Local não informado' }}
+                                    <i class="bi bi-clock"></i> {{ match.match_time }} 
+                                    <i class="bi bi-calendar"></i> {{ format_date(match.match_date) }}
+                                </div>
+                            </div>
+                            
+                            <div class="card-body">
+                                <h5><i class="bi bi-graph-up"></i> Previsões</h5>
+                                <div class="predictions">
+                                    <div class="prediction-card">
+                                        <h6>Placar Previsto</h6>
+                                        <div class="score">{{ match.predicted_score or 'X-X' }}</div>
+                                    </div>
+                                    
+                                    <div class="prediction-card">
+                                        <h6>Probabilidades</h6>
+                                        <div class="progress-container">
+                                            <label>Casa: {{ match.home_win_percent }}%</label>
+                                            <progress value="{{ match.home_win_percent }}" max="100"></progress>
+                                            
+                                            <label>Empate: {{ match.draw_percent }}%</label>
+                                            <progress value="{{ match.draw_percent }}" max="100"></progress>
+                                            
+                                            <label>Visitante: {{ match.away_win_percent }}%</label>
+                                            <progress value="{{ match.away_win_percent }}" max="100"></progress>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="prediction-card">
+                                        <h6>Estatísticas</h6>
+                                        <div class="stats">
+                                            <div><span>Over 1.5:</span> <strong>{{ match.over_15_percent }}%</strong></div>
+                                            <div><span>Over 2.5:</span> <strong>{{ match.over_25_percent }}%</strong></div>
+                                            <div><span>Ambos marcam:</span> <strong>{{ match.btts_percent }}%</strong></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {% if match.details %}
+                                    <h5><i class="bi bi-info-circle"></i> Análise</h5>
+                                    <div class="analysis">{{ match.details }}</div>
+                                {% endif %}
+                            </div>
                         </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-info text-center">
-                    <i class="bi bi-info-circle"></i> Nenhum jogo encontrado para hoje.
-                </div>
-            {% endif %}
-            
-            <!-- Jogos de Amanhã -->
-            <div class="day-title">
-                <span><i class="bi bi-calendar-plus"></i> Jogos de Amanhã</span>
+                    </div>
+                {% endfor %}
             </div>
-            
-            {% if tomorrow_matches %}
-                <div class="row">
-                    {% for match in tomorrow_matches %}
-                        <div class="col-lg-6">
-                            {% include 'match_card.html' %}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-info text-center">
-                    <i class="bi bi-info-circle"></i> Nenhum jogo encontrado para amanhã.
-                </div>
-            {% endif %}
-            
         {% else %}
-            <div class="alert alert-warning text-center">
-                <i class="bi bi-exclamation-triangle"></i> Nenhum jogo encontrado no momento.
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle"></i> Nenhum jogo encontrado
             </div>
         {% endif %}
-        
-        <div class="text-center my-4">
-            <div class="update-info">
-                <i class="bi bi-arrow-clockwise"></i> Atualizado em: {{ last_updated }}
-                <span class="confidence-badge high-confidence">Alta Confiança</span>
-            </div>
-        </div>
+    {% endfor %}
+    
+    <div class="update-info">
+        <i class="bi bi-arrow-clockwise"></i> Atualizado em: {{ last_updated }}
+        <span class="confidence-badge">Alta Confiança</span>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Adiciona animação aos cards quando aparecem na tela
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.match-card');
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = 1;
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            }, { threshold: 0.1 });
-            
-            cards.forEach(card => {
-                card.style.opacity = 0;
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                observer.observe(card);
-            });
-        });
-    </script>
-</body>
-</html>
+    
+    <div class="text-center mt-4">
+        <a href="/admin" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-lock"></i> Área Administrativa
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,15 +1,4 @@
-# 🚨 DEPENDÊNCIAS DE BUILD (INSTALAR PRIMEIRO)
-setuptools==65.5.1
-wheel==0.38.4
-pip==23.0.1
-
-# 📦 DEPENDÊNCIAS PRINCIPAIS
 flask==2.3.2
-requests==2.31.0
-beautifulsoup4==4.12.2
-apscheduler==3.10.1
-pytz==2023.3
-numpy==1.24.3
+werkzeug==2.3.7
 python-dotenv==1.0.0
 gunicorn==20.1.0
-lxml==4.9.3

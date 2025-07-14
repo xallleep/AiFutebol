@@ -1,37 +1,92 @@
-<div class="card match-card {% if match.is_today %}today-card{% else %}tomorrow-card{% endif %}">
+<div class="card match-card {% if match.is_today %}today-card{% else %}tomorrow-card{% endif %} {{ match.color_scheme }}-scheme">
     <div class="match-header text-center">
-        <div class="competition-badge">{{ match.competition[:20] }}{% if match.competition|length > 20 %}...{% endif %}</div>
+        {% if match.competition %}
+            <div class="competition-badge">{{ match.competition[:20] }}{% if match.competition|length > 20 %}...{% endif %}</div>
+        {% endif %}
         <div class="d-flex justify-content-center align-items-center my-2">
             <div class="team-name text-end">{{ match.home_team }}</div>
             <div class="vs-circle">VS</div>
             <div class="team-name text-start">{{ match.away_team }}</div>
         </div>
         <div class="text-light">
-            <i class="bi bi-clock"></i> {{ match.time }} | {{ match.date }}
+            <i class="bi bi-geo-alt"></i> {{ match.location or 'Local não informado' }} | 
+            <i class="bi bi-clock"></i> {{ match.match_time }} | {{ match.formatted_date }}
         </div>
     </div>
     
     <div class="card-body">
-        <!-- Seção de Previsões (mantida) -->
+        <!-- Seção de Previsões -->
         <h5 class="mb-3"><i class="bi bi-graph-up" style="color: var(--accent);"></i> Previsões do Jogo</h5>
         <div class="row">
             <div class="col-md-4">
                 <div class="card prediction-card h-100">
                     <div class="card-body text-center">
                         <h6 class="card-title text-muted">PLACAR PREVISTO</h6>
-                        <h2 class="mb-0" style="color: var(--accent);">{{ match.predicted_score }}</h2>
+                        <h2 class="mb-0" style="color: var(--accent);">{{ match.predicted_score or 'X-X' }}</h2>
                     </div>
                 </div>
             </div>
-            <!-- Outras previsões mantidas... -->
+            <div class="col-md-4">
+                <div class="card prediction-card h-100">
+                    <div class="card-body text-center">
+                        <h6 class="card-title text-muted">PROBABILIDADES</h6>
+                        <div class="progress my-2" style="height: 20px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ match.home_win_percent }}%" 
+                                 aria-valuenow="{{ match.home_win_percent }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ match.home_win_percent }}%
+                            </div>
+                        </div>
+                        <div class="progress my-2" style="height: 20px;">
+                            <div class="progress-bar bg-warning" role="progressbar" 
+                                 style="width: {{ match.draw_percent }}%" 
+                                 aria-valuenow="{{ match.draw_percent }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ match.draw_percent }}%
+                            </div>
+                        </div>
+                        <div class="progress my-2" style="height: 20px;">
+                            <div class="progress-bar bg-danger" role="progressbar" 
+                                 style="width: {{ match.away_win_percent }}%" 
+                                 aria-valuenow="{{ match.away_win_percent }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ match.away_win_percent }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card prediction-card h-100">
+                    <div class="card-body text-center">
+                        <h6 class="card-title text-muted">OUTRAS APOSTAS</h6>
+                        <div class="d-flex justify-content-between my-2">
+                            <span>Over 1.5:</span>
+                            <strong>{{ match.over_15_percent }}%</strong>
+                        </div>
+                        <div class="d-flex justify-content-between my-2">
+                            <span>Over 2.5:</span>
+                            <strong>{{ match.over_25_percent }}%</strong>
+                        </div>
+                        <div class="d-flex justify-content-between my-2">
+                            <span>Ambos marcam:</span>
+                            <strong>{{ match.btts_percent }}%</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <!-- Seção de Estatísticas (mantida) -->
-        <h5 class="mt-4"><i class="bi bi-bar-chart-line"></i> Estatísticas Previstas</h5>
-        <div class="row">
-            <!-- Estatísticas mantidas... -->
-        </div>
-        
-        <!-- REMOVIDA a seção de escalações completamente -->
+        <!-- Detalhes -->
+        {% if match.details %}
+            <h5 class="mt-4"><i class="bi bi-info-circle"></i> Análise</h5>
+            <div class="alert alert-light">
+                {{ match.details }}
+            </div>
+        {% endif %}
     </div>
 </div>

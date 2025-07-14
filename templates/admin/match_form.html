@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <h2 class="mb-4">
+        <i class="bi bi-{{ 'pencil' if match else 'plus' }}"></i>
+        {{ 'Editar' if match else 'Adicionar' }} Jogo
+    </h2>
+    
+    <form method="POST" action="{{ url_for('manage_match', match_id=match.id if match else None) }}">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="home_team" class="form-label">Time da Casa</label>
+                <input type="text" class="form-control" id="home_team" name="home_team" 
+                       value="{{ match.home_team if match }}" required>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="away_team" class="form-label">Time Visitante</label>
+                <input type="text" class="form-control" id="away_team" name="away_team" 
+                       value="{{ match.away_team if match }}" required>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="competition" class="form-label">Competição</label>
+                <input type="text" class="form-control" id="competition" name="competition" 
+                       value="{{ match.competition if match }}">
+            </div>
+            
+            <div class="col-md-6">
+                <label for="location" class="form-label">Local</label>
+                <input type="text" class="form-control" id="location" name="location" 
+                       value="{{ match.location if match }}">
+            </div>
+            
+            <div class="col-md-6">
+                <label for="match_date" class="form-label">Data</label>
+                <input type="date" class="form-control" id="match_date" name="match_date" 
+                       value="{{ match.match_date if match }}" required>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="match_time" class="form-label">Hora</label>
+                <input type="time" class="form-control" id="match_time" name="match_time" 
+                       value="{{ match.match_time if match }}" required>
+            </div>
+            
+            <div class="col-md-4">
+                <label for="predicted_score" class="form-label">Placar Previsto</label>
+                <input type="text" class="form-control" id="predicted_score" name="predicted_score" 
+                       value="{{ match.predicted_score if match }}" placeholder="Ex: 2-1">
+            </div>
+            
+            <div class="col-md-4">
+                <label for="color_scheme" class="form-label">Esquema de Cores</label>
+                <select class="form-select" id="color_scheme" name="color_scheme">
+                    <option value="blue" {{ 'selected' if match and match.color_scheme == 'blue' }}>Azul</option>
+                    <option value="green" {{ 'selected' if match and match.color_scheme == 'green' }}>Verde</option>
+                    <option value="red" {{ 'selected' if match and match.color_scheme == 'red' }}>Vermelho</option>
+                    <option value="purple" {{ 'selected' if match and match.color_scheme == 'purple' }}>Roxo</option>
+                    <option value="orange" {{ 'selected' if match and match.color_scheme == 'orange' }}>Laranja</option>
+                </select>
+            </div>
+            
+            <div class="col-md-4">
+                <label for="display_order" class="form-label">Ordem de Exibição</label>
+                <input type="number" class="form-control" id="display_order" name="display_order" 
+                       value="{{ match.display_order if match else 0 }}">
+            </div>
+            
+            <div class="col-md-4">
+                <label for="home_win_percent" class="form-label">% Vitória Casa</label>
+                <input type="number" class="form-control" id="home_win_percent" name="home_win_percent" 
+                       value="{{ match.home_win_percent if match else 0 }}" min="0" max="100">
+            </div>
+            
+            <div class="col-md-4">
+                <label for="draw_percent" class="form-label">% Empate</label>
+                <input type="number" class="form-control" id="draw_percent" name="draw_percent" 
+                       value="{{ match.draw_percent if match else 0 }}" min="0" max="100">
+            </div>
+            
+            <div class="col-md-4">
+                <label for="away_win_percent" class="form-label">% Vitória Visitante</label>
+                <input type="number" class="form-control" id="away_win_percent" name="away_win_percent" 
+                       value="{{ match.away_win_percent if match else 0 }}" min="0" max="100">
+            </div>
+            
+            <div class="col-md-4">
+                <label for="over_15_percent" class="form-label">% Over 1.5</label>
+                <input type="number" class="form-control" id="over_15_percent" name="over_15_percent" 
+                       value="{{ match.over_15_percent if match else 0 }}" min="0" max="100">
+            </div>
+            
+            <div class="col-md-4">
+                <label for="over_25_percent" class="form-label">% Over 2.5</label>
+                <input type="number" class="form-control" id="over_25_percent" name="over_25_percent" 
+                       value="{{ match.over_25_percent if match else 0 }}" min="0" max="100">
+            </div>
+            
+            <div class="col-md-4">
+                <label for="btts_percent" class="form-label">% Ambos Marcam</label>
+                <input type="number" class="form-control" id="btts_percent" name="btts_percent" 
+                       value="{{ match.btts_percent if match else 0 }}" min="0" max="100">
+            </div>
+            
+            <div class="col-12">
+                <label for="details" class="form-label">Análise/Detalhes</label>
+                <textarea class="form-control" id="details" name="details" rows="4">{{ match.details if match }}</textarea>
+            </div>
+            
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary px-4 py-2">
+                    <i class="bi bi-check-lg"></i> Salvar
+                </button>
+                
+                {% if match %}
+                    <button type="submit" name="delete" value="1" class="btn btn-danger ms-2 px-4 py-2"
+                            onclick="return confirm('Tem certeza que deseja excluir este jogo?');">
+                        <i class="bi bi-trash"></i> Excluir
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
