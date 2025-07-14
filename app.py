@@ -9,12 +9,11 @@ app.secret_key = os.environ.get('SECRET_KEY') or 'dev-key-123'
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Configurações
+# Database configuration
 DATABASE = 'matches.db'
 ADMIN_USER = os.environ.get('ADMIN_USER', 'admin')
 ADMIN_PASS = generate_password_hash(os.environ.get('ADMIN_PASS', 'admin123'))
 
-# Inicialização do banco de dados
 def init_db():
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
@@ -42,7 +41,6 @@ def init_db():
 
 init_db()
 
-# Funções auxiliares
 def get_db():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
@@ -54,7 +52,6 @@ def format_date(date_str):
     except:
         return date_str
 
-# Rotas principais
 @app.route('/')
 def index():
     conn = get_db()
@@ -82,7 +79,6 @@ def index():
                          other_matches=other_matches,
                          last_updated=last_updated)
 
-# Área administrativa
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
     if session.get('admin_logged_in'):

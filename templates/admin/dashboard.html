@@ -3,14 +3,14 @@
 {% block content %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
     <div class="container">
-        <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+        <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
             <i class="bi bi-speedometer2"></i> Painel Admin
         </a>
         <div class="d-flex">
-            <a href="{{ url_for('manage_match') }}" class="btn btn-light btn-sm me-2">
+            <a href="{{ url_for('add_match') }}" class="btn btn-light btn-sm me-2">
                 <i class="bi bi-plus-lg"></i> Novo
             </a>
-            <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-light btn-sm">
                 <i class="bi bi-box-arrow-right"></i> Sair
             </a>
         </div>
@@ -47,18 +47,17 @@
                             <td>{{ match.display_order }}</td>
                             <td>
                                 <strong>{{ match.home_team }} x {{ match.away_team }}</strong>
-                                <div class="text-muted small">{{ match.competition or '-' }}</div>
                             </td>
-                            <td>{{ format_date(match.match_date) }}<br>{{ match.match_time }}</td>
+                            <td>{{ match.competition or '-' }}</td>
+                            <td>{{ match.formatted_date }} {{ match.match_time }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ url_for('manage_match', match_id=match.id) }}" 
+                                    <a href="{{ url_for('edit_match', match_id=match.id) }}" 
                                        class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form method="POST" action="{{ url_for('manage_match', match_id=match.id) }}"
+                                    <form method="POST" action="{{ url_for('delete_match', match_id=match.id) }}"
                                           onsubmit="return confirm('Tem certeza que deseja excluir este jogo?');">
-                                        <input type="hidden" name="_method" value="DELETE">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">
                                             <i class="bi bi-trash"></i>
                                         </button>
