@@ -208,63 +208,80 @@
             font-weight: 600;
         }
         
-        /* Estilos para os anúncios - Reorganizados */
+        /* Estilos profissionais para os anúncios */
         .ad-container {
             margin: 20px auto;
             text-align: center;
             overflow: hidden;
-            background: #f0f0f0;
-            padding: 10px;
+            background: #ffffff;
+            padding: 15px;
             border-radius: 8px;
-            max-width: 728px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e0e0e0;
+            max-width: 100%;
         }
+        
         .ad-top {
             margin: 20px auto 30px;
+            max-width: 728px;
         }
+        
         .ad-middle {
             margin: 40px auto;
+            max-width: 728px;
         }
+        
         .ad-bottom {
             margin: 40px auto 20px;
+            max-width: 728px;
         }
+        
         .ad-sticky {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: white;
-            padding: 10px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            padding: 12px;
+            box-shadow: 0 -2px 15px rgba(0,0,0,0.1);
             z-index: 1000;
             text-align: center;
-            display: none; /* Escondido por padrão para mobile */
-        }
-        .ad-link {
-            display: inline-block;
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
-            color: white;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 0.9rem;
+            display: none;
+            border-top: 1px solid #e0e0e0;
         }
         
+        .ad-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        /* Responsividade para anúncios */
         @media (min-width: 768px) {
             .ad-sticky {
-                display: block; /* Mostra apenas em desktop */
+                display: block;
             }
             body {
-                padding-bottom: 60px; /* Espaço para o sticky ad */
+                padding-bottom: 70px;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .ad-container {
+                padding: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Anúncio Topo - Apenas um banner principal -->
+    <!-- Anúncio Topo - Banner principal -->
     <div class="ad-container ad-top">
+        <span class="ad-label">Publicidade</span>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000" crossorigin="anonymous"></script>
-        <!-- Banner Topo -->
+        <!-- Banner Topo Responsivo -->
         <ins class="adsbygoogle"
              style="display:block"
              data-ad-client="ca-pub-0000000000000000"
@@ -412,10 +429,11 @@
                 </div>
             {% endif %}
             
-            <!-- Anúncio Meio - Apenas um entre seções -->
+            <!-- Anúncio Meio - Entre seções -->
             <div class="ad-container ad-middle">
+                <span class="ad-label">Patrocinado</span>
                 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000" crossorigin="anonymous"></script>
-                <!-- Banner Meio -->
+                <!-- Banner Meio Responsivo -->
                 <ins class="adsbygoogle"
                      style="display:block"
                      data-ad-client="ca-pub-0000000000000000"
@@ -501,10 +519,11 @@
             </div>
         {% endif %}
         
-        <!-- Anúncio Rodapé - Apenas um no final -->
+        <!-- Anúncio Rodapé -->
         <div class="ad-container ad-bottom">
+            <span class="ad-label">Publicidade</span>
             <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000" crossorigin="anonymous"></script>
-            <!-- Banner Rodapé -->
+            <!-- Banner Rodapé Responsivo -->
             <ins class="adsbygoogle"
                  style="display:block"
                  data-ad-client="ca-pub-0000000000000000"
@@ -523,10 +542,11 @@
 
     <!-- Anúncio Sticky (Fixo no rodapé) - Apenas em desktop -->
     <div class="ad-sticky">
+        <span class="ad-label">Patrocinado</span>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000" crossorigin="anonymous"></script>
-        <!-- Banner Sticky -->
+        <!-- Banner Sticky Responsivo -->
         <ins class="adsbygoogle"
-             style="display:inline-block;width:320px;height:50px"
+             style="display:inline-block;width:100%;max-width:728px;height:90px"
              data-ad-client="ca-pub-0000000000000000"
              data-ad-slot="0000000000"></ins>
         <script>
