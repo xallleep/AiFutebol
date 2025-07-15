@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from datetime import datetime
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -24,9 +24,6 @@ if DATABASE_URL.startswith('postgres://'):
 ADMIN_USER = os.environ.get('ADMIN_USER', 'admin')
 ADMIN_PASS = generate_password_hash(os.environ.get('ADMIN_PASS', 'admin123'))
 
-# Configuração do Stripe
-stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
-
 # Decorators
 def login_required(f):
     @wraps(f)
@@ -34,15 +31,6 @@ def login_required(f):
         if not session.get('admin_logged_in'):
             flash('Por favor faça login para acessar esta página', 'danger')
             return redirect(url_for('admin_login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def premium_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('is_premium'):
-            flash('Assine o plano premium para acessar este conteúdo', 'warning')
-            return redirect(url_for('premium'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -79,8 +67,6 @@ def init_db():
                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
                      email TEXT UNIQUE NOT NULL,
                      password TEXT NOT NULL,
-                     is_premium BOOLEAN DEFAULT FALSE,
-                     stripe_customer_id TEXT,
                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
         
         conn.commit()
@@ -287,124 +273,6 @@ def delete_match(match_id):
         flash('Erro ao excluir jogo', 'danger')
     
     return redirect(url_for('admin_dashboard'))
-
-# Rotas de assinatura
-@app.route('/premium')
-def premium():
-    return render_template('premium.html', 
-                         stripe_public_key=os.environ.get('STRIPE_PUBLIC_KEY'))
-
-@app.route('/create-subscription', methods=['POST'])
-def create_subscription():
-    try:
-        email = request.form.get('email')
-        
-        # Verifica se o usuário já existe
-        conn = get_db()
-        user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
-        
-        if not user:
-            # Cria usuário no banco de dados
-            conn.execute('INSERT INTO users (email, password) VALUES (?, ?)',
-                        (email, generate_password_hash(os.urandom(16).hex())))
-            conn.commit()
-        
-        # Cria sessão de checkout no Stripe
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[{
-                'price': os.environ.get('STRIPE_PRICE_ID'),
-                'quantity': 1,
-            }],
-            mode='subscription',
-            success_url=url_for('payment_success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url=url_for('payment_canceled', _external=True),
-            customer_email=email
-        )
-        return redirect(checkout_session.url)
-    except Exception as e:
-        logger.error(f"Erro no checkout: {str(e)}")
-        flash('Erro ao processar pagamento. Tente novamente.', 'error')
-        return redirect(url_for('premium'))
-
-@app.route('/payment-success')
-def payment_success():
-    session_id = request.args.get('session_id')
-    
-    try:
-        stripe_session = stripe.checkout.Session.retrieve(session_id)
-        customer_id = stripe_session.customer
-        email = stripe_session.customer_details.email
-        
-        conn = get_db()
-        conn.execute('UPDATE users SET is_premium = TRUE, stripe_customer_id = ? WHERE email = ?',
-                   (customer_id, email))
-        conn.commit()
-        conn.close()
-        
-        session['is_premium'] = True
-        session['user_email'] = email
-        flash('Assinatura ativada com sucesso!', 'success')
-    except Exception as e:
-        logger.error(f"Erro ao processar sucesso de pagamento: {str(e)}")
-        flash('Pagamento confirmado, mas houve um erro ao ativar sua conta. Contate o suporte.', 'warning')
-    
-    return redirect(url_for('index'))
-
-@app.route('/payment-canceled')
-def payment_canceled():
-    flash('Pagamento cancelado', 'warning')
-    return redirect(url_for('premium'))
-
-@app.route('/stripe-webhook', methods=['POST'])
-def stripe_webhook():
-    payload = request.data
-    sig_header = request.headers.get('Stripe-Signature')
-    endpoint_secret = os.environ.get('STRIPE_WEBHOOK_SECRET')
-
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, endpoint_secret
-        )
-    except ValueError as e:
-        logger.error(f"Webhook - Payload inválido: {str(e)}")
-        return jsonify({'error': 'Payload inválido'}), 400
-    except stripe.error.SignatureVerificationError as e:
-        logger.error(f"Webhook - Assinatura inválida: {str(e)}")
-        return jsonify({'error': 'Assinatura inválida'}), 400
-
-    # Tratar eventos relevantes
-    if event['type'] == 'invoice.paid':
-        customer_id = event['data']['object']['customer']
-        try:
-            conn = get_db()
-            conn.execute('UPDATE users SET is_premium = TRUE WHERE stripe_customer_id = ?',
-                       (customer_id,))
-            conn.commit()
-            conn.close()
-            logger.info(f"Assinatura renovada para customer: {customer_id}")
-        except Exception as e:
-            logger.error(f"Erro ao processar webhook invoice.paid: {str(e)}")
-
-    elif event['type'] == 'customer.subscription.deleted':
-        customer_id = event['data']['object']['customer']
-        try:
-            conn = get_db()
-            conn.execute('UPDATE users SET is_premium = FALSE WHERE stripe_customer_id = ?',
-                       (customer_id,))
-            conn.commit()
-            conn.close()
-            logger.info(f"Assinatura cancelada para customer: {customer_id}")
-        except Exception as e:
-            logger.error(f"Erro ao processar webhook subscription.deleted: {str(e)}")
-
-    return jsonify({'success': True}), 200
-
-# Rota de conteúdo premium protegida
-@app.route('/conteudo-premium')
-@premium_required
-def conteudo_premium():
-    return render_template('conteudo_premium.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
