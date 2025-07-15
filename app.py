@@ -6,7 +6,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from pathlib import Path
 import logging
 from functools import wraps
-import stripe
 
 # Configuração de logging
 logging.basicConfig(level=logging.DEBUG)
