@@ -309,12 +309,7 @@
             {% endfor %}
         {% endwith %}
         
-        <!-- Novo anúncio adicionado antes da seção principal -->
-        <div class="ad-container">
-            <span class="ad-label">Patrocinado</span>
-            <script type='text/javascript' src='//pl27172931.profitableratecpm.com/71/ba/5d/71ba5d472ffba51f4b48bd1ae214a69a.js'></script>
-        </div>
-        
+        <!-- Seção de Jogos de Hoje -->
         {% if today_matches or other_matches %}
             <div class="text-center">
                 <span class="day-title">
@@ -325,6 +320,15 @@
             {% if today_matches %}
                 <div class="row g-4">
                     {% for match in today_matches %}
+                        <!-- ANÚNCIO ANTES DE CADA PALPITE -->
+                        <div class="col-12">
+                            <div class="ad-container">
+                                <span class="ad-label">Patrocinado</span>
+                                <script type='text/javascript' src='//pl27172931.profitableratecpm.com/71/ba/5d/71ba5d472ffba51f4b48bd1ae214a69a.js'></script>
+                            </div>
+                        </div>
+
+                        <!-- PALPITE -->
                         <div class="col-lg-6">
                             <div class="card match-card {{ match.color_scheme }}-scheme">
                                 {% if match.is_today %}
@@ -434,7 +438,7 @@
                 </div>
             {% endif %}
             
-            <!-- Anúncio Meio - Entre seções -->
+            <!-- Anúncio Meio -->
             <div class="ad-container ad-middle">
                 <span class="ad-label">Publicidade</span>
                 <script type='text/javascript' src='//pl27171405.profitableratecpm.com/67/52/46/675246a6707a02d8d4b2084bb87f15cd.js'></script>
@@ -449,6 +453,16 @@
             {% if other_matches %}
                 <div class="row g-4">
                     {% for match in other_matches %}
+                        <!-- ANÚNCIO ANTES DE CADA PALPITE -->
+                        <div class="col-12">
+                            <div class="ad-container">
+                                <span class="ad-label">Patrocinado</span>
+                                <script async="async" data-cfasync="false" src="//pl27168088.profitableratecpm.com/61f4ffca7c31ee153208a5252559233d/invoke.js"></script>
+                                <div id="container-61f4ffca7c31ee153208a5252559233d"></div>
+                            </div>
+                        </div>
+
+                        <!-- PALPITE -->
                         <div class="col-lg-6">
                             <div class="card match-card {{ match.color_scheme }}-scheme">
                                 <div class="match-header">
@@ -517,8 +531,16 @@
         <!-- Anúncio Rodapé -->
         <div class="ad-container ad-bottom">
             <span class="ad-label">Publicidade</span>
-            <script async="async" data-cfasync="false" src="//pl27168088.profitableratecpm.com/61f4ffca7c31ee153208a5252559233d/invoke.js"></script>
-            <div id="container-61f4ffca7c31ee153208a5252559233d"></div>
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '6da10f73d2fac466374851d2b785bb64',
+                    'format' : 'iframe',
+                    'height' : 60,
+                    'width' : 468,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.profitableratecpm.com/eis92cw4?key=6da10f73d2fac466374851d2b785bb64"></script>
         </div>
         
         <div class="update-info">
